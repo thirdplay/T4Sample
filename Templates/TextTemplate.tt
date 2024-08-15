@@ -1,0 +1,45 @@
+
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ output extension=".cs" #>
+using System;
+using System.Collections.Generic;
+
+namespace <#= NameSpace #>
+{
+<# if (!string.IsNullOrEmpty(Table.Description)) { #>
+    /// <summery>
+    /// <#= Table.Description #>
+    /// </summery>
+<# } #>
+    public class <#= Table.Name #>
+    {
+<# foreach (var x in Table.Columns) { #>
+<# if (!string.IsNullOrEmpty(x.Description)) { #>
+        /// <summery>
+        /// <#= x.Description #>
+        /// </summery>
+<# } // End if #>
+        public <#= GetColumnType(x) #> <#= x.Name #> { get; <#= x.IsPrimary ? "" : "set; " #>}
+
+<# } // End foreach #>
+        public <#= Table.Name #>(
+            <#= string.Join(",\n            ", Table.Columns.Where(x => x.IsPrimary).Select(d => $"{GetColumnType(d)} {d.Name}")) #>
+        )
+        {
+<# foreach (var x in Table.Columns.Where(x => x.IsPrimary)) { #>
+            <#= x.Name #> = <#= x.Name #>;
+<# } #>
+        }
+
+        public <#= Table.Name #>(
+            <#= string.Join(",\n            ", Table.Columns.Select(d => $"{GetColumnType(d)} {d.Name}")) #>
+        )
+        {
+<# foreach (var x in Table.Columns) { #>
+            <#= x.Name #> = <#= x.Name #>;
+<# } #>
+        }
+    }
+}
